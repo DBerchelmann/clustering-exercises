@@ -148,7 +148,7 @@ missing_zero_values_table(df)
 
 def handle_missing_values(df, prop_required_row = 0.5, prop_required_col = 0.5):
     ''' function which takes in a dataframe, required notnull proportions of non-null rows and columns.
-    drop the columns and rows columns based on theshold:'''
+    drop the columns and rows columns based on threshold:'''
     
     #drop columns with nulls
     threshold = int(prop_required_col * len(df.index)) # Require that many non-NA values.
@@ -160,3 +160,29 @@ def handle_missing_values(df, prop_required_row = 0.5, prop_required_col = 0.5):
     
     
     return df
+
+
+def features_missing(df):
+    
+    '''This function creates a new dataframe that analyzes the total features(columns) missing for the rows in
+    the data frame. It also give s a percentage'''
+    
+    # Locate rows with. missing features and convert into a series
+    df2 = df.isnull().sum(axis =1).value_counts().sort_index(ascending=False)
+    
+    # convert into a dataframe
+    df2 = pd.DataFrame(df2)
+    
+    # reset the index
+    df2.reset_index(level=0, inplace=True)
+    
+    # rename the columns for readability
+    df2.columns= ['total_features_missing', 'total_rows_affected'] 
+    
+    # create a column showing the percentage of features missing from a row
+    df2['pct_features_missing']= round((df2.total_features_missing /df.shape[1]) * 100, 2)
+    
+    # reorder the columns for readability/scanning
+    df2 = df2[['total_features_missing', 'pct_features_missing', 'total_rows_affected']]
+    
+    return df2
